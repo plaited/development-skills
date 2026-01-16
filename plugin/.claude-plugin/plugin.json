@@ -1,7 +1,7 @@
 {
   "name": "typescript-lsp",
   "description": "Type-aware TypeScript/JavaScript symbol search using Language Server Protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Plaited Labs"
   },
