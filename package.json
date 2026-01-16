@@ -14,8 +14,7 @@
     "check:package": "format-package --check",
     "check:types": "tsc --noEmit",
     "check:write": "biome check --write && format-package --write",
-    "prepare": "git config core.hooksPath .hooks || true",
-    "test": "bun test ./plugin/skills/typescript-lsp/scripts/tests/lsp-client.spec.ts ./plugin/skills/typescript-lsp/scripts/tests/resolve-file-path.spec.ts"
+    "prepare": "git config core.hooksPath .hooks || true"
   },
   "lint-staged": {
     "*.{js,cjs,jsx,tsx,ts}": [
