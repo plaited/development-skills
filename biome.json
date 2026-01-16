@@ -6,7 +6,8 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 120
+    "lineWidth": 120,
+    "includes": ["**", "./.claude/**/*"]
   },
   "linter": {
     "enabled": true,
@@ -40,7 +41,8 @@
       "complexity": {
         "useLiteralKeys": "warn"
       }
-    }
+    },
+    "includes": ["**", "./.claude/**/*"]
   },
   "javascript": {
     "formatter": {
@@ -62,7 +64,7 @@
       }
     },
     {
-      "includes": ["**/tests/**/*", "./.claude/skills/**/*"],
+      "includes": ["**/tests/**/*",  "./.claude/**/*"],
       "linter": {
         "rules": {
           "suspicious": {
