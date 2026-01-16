@@ -6,5 +6,13 @@
     "name": "Plaited Labs"
   },
   "repository": "https://github.com/plaited/development-skills",
-  "license": "ISC"
+  "license": "ISC",
+  "skills": "./.claude/skills",
+  "commands": "./.claude/commands",
+  "mcpServers": {
+    "agent-skills-spec": {
+      "type": "http",
+      "url": "https://agentskills.io/mcp"
+    }
+  }
 }

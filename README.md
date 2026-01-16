@@ -7,13 +7,7 @@ Development skills for Claude Code - TypeScript LSP, code documentation, and val
 Install via the Plaited marketplace:
 
 ```bash
-claude plugins add github:plaited/marketplace
-```
-
-Or install directly:
-
-```bash
-claude plugins add github:plaited/development-skills/.claude
+/plugin marketplace add plaited/marketplace
 ```
 
 **Other AI coding agents:**

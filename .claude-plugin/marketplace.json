@@ -9,15 +9,7 @@
   "plugins": [
     {
       "name": "development-skills",
-      "description": "Development skills for Claude Code - TypeScript LSP, code documentation, and validation tools",
-      "source": "./",
-      "version": "0.3.1",
-      "author": {
-        "name": "Plaited Labs"
-      },
-      "license": "ISC",
-      "category": "development",
-      "keywords": ["typescript", "lsp", "documentation", "validation", "code-quality"]
+      "source": "./"
     }
   ]
 }
