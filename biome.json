@@ -64,7 +64,7 @@
       }
     },
     {
-      "includes": ["**/tests/**/*", ".claude/**/*"],
+      "includes": ["**/tests/**/*", "skills/**/*"],
       "linter": {
         "rules": {
           "suspicious": {
