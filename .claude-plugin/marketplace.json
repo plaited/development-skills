@@ -1,0 +1,15 @@
+{
+  "name": "plaited-development-skills",
+  "metadata": {
+    "description": "Development skills for Claude Code - TypeScript LSP, code documentation, and validation tools"
+  },
+  "owner": {
+    "name": "Plaited Labs"
+  },
+  "plugins": [
+    {
+      "name": "development-skills",
+      "source": "./"
+    }
+  ]
+}
