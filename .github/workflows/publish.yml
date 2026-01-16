@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: 'Version bump type'
+        description: "Version bump type"
         required: true
         type: choice
         options:
@@ -41,8 +41,8 @@ jobs:
             patch) NEW="${MAJOR}.${MINOR}.$((PATCH + 1))" ;;
           esac
 
-          jq --arg v "$NEW" '.version = $v' plugin/.claude-plugin/plugin.json > tmp.json
-          mv tmp.json plugin/.claude-plugin/plugin.json
+          jq --arg v "$VERSION" '.version = $v' .claude-plugin/plugin.json > .claude-plugin/plugin.json.tmp
+          mv .claude-plugin/plugin.json.tmp .claude-plugin/plugin.json
 
           echo "version=$NEW" >> "$GITHUB_OUTPUT"
           echo "Bumped version: $CURRENT → $NEW"

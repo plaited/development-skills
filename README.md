@@ -13,7 +13,7 @@ claude plugins add github:plaited/marketplace
 Or install directly:
 
 ```bash
-claude plugins add github:plaited/development-skills/plugin
+claude plugins add github:plaited/development-skills/.claude
 ```
 
 **Other AI coding agents:**

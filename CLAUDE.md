@@ -50,6 +50,8 @@ This repository hosts the **development-skills** Claude Code plugin with the fol
 
 **Skill Validation** (`/validate-skill`) - Validate skills against AgentSkills spec
 
+**Scaffold Rules** (`/scaffold-rules`) - Scaffold development rules for AI coding agents
+
 ### Code Style Essentials
 
 - Prefer arrow functions and `type` over `interface`
@@ -63,10 +65,11 @@ For complete conventions, see `.claude/rules/code-review.md`
 ### Plugin Development
 
 This project is a Claude Code plugin. Structure:
-- `plugin/skills/typescript-lsp/` - TypeScript LSP skill
-- `plugin/skills/code-documentation/` - Code documentation skill
-- `plugin/skills/validate-skill/` - Skill validation skill
-- `plugin/commands/` - Slash command definitions
+- `.claude/skills/typescript-lsp/` - TypeScript LSP skill
+- `.claude/skills/code-documentation/` - Code documentation skill
+- `.claude/skills/validate-skill/` - Skill validation skill
+- `.claude/skills/scaffold-rules/` - Scaffold development rules skill
+- `.claude/commands/` - Slash command definitions
 - `.claude/rules/` - Development guidance (not published)
 
 When working on the plugin:
@@ -92,17 +95,20 @@ When working on the plugin:
 
 The **development-skills** plugin provides:
 
-**TypeScript LSP** (`plugin/skills/typescript-lsp/`):
+**TypeScript LSP** (`.claude/skills/typescript-lsp/`):
 - Type-aware symbol search across workspace
 - Hover information (type signatures, docs)
 - Reference finding before refactoring
 - Batch analysis for efficiency
 
-**Code Documentation** (`plugin/skills/code-documentation/`):
+**Code Documentation** (`.claude/skills/code-documentation/`):
 - Documentation generation utilities
 
-**Skill Validation** (`plugin/skills/validate-skill/`):
+**Skill Validation** (`.claude/skills/validate-skill/`):
 - Validate skills against AgentSkills spec
+
+**Scaffold Rules** (`.claude/skills/scaffold-rules/`):
+- Scaffold development rules for AI coding agents
 
 Install via marketplace: `github:plaited/marketplace`
 
