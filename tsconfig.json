@@ -1,5 +1,5 @@
 {
-  "include": ["skills/**/*"],
+  "include": [".claude/skills/**/*"],
   "compilerOptions": {
     // Enable latest features
     "lib": ["ESNext", "DOM", "dom.iterable"],
