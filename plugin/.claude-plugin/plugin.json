@@ -1,0 +1,10 @@
+{
+  "name": "typescript-lsp",
+  "description": "Type-aware TypeScript/JavaScript symbol search using Language Server Protocol",
+  "version": "0.1.0",
+  "author": {
+    "name": "Plaited Labs"
+  },
+  "repository": "https://github.com/plaited/typescript-lsp",
+  "license": "ISC"
+}
