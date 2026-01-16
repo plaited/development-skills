@@ -32,7 +32,7 @@ jobs:
       - name: Bump version
         id: version
         run: |
-          CURRENT=$(jq -r .version plugin/.claude-plugin/plugin.json)
+          CURRENT=$(jq -r .version .claude-plugin/plugin.json)
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
 
           case "${{ inputs.bump }}" in
@@ -49,7 +49,7 @@ jobs:
 
       - name: Commit and tag
         run: |
-          git add plugin/.claude-plugin/plugin.json
+          git add .claude-plugin/plugin.json
           git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
           git tag "v${{ steps.version.outputs.version }}"
           git push
