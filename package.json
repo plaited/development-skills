@@ -1,6 +1,5 @@
 {
   "name": "typescript-lsp",
-  "version": "0.1.0",
   "description": "TypeScript LSP skill for Claude Code - type-aware symbol search and verification",
   "license": "ISC",
   "private": true,
