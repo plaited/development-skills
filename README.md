@@ -4,6 +4,8 @@ Development skills for Claude Code - TypeScript LSP, code documentation, and val
 
 ## Installation
 
+**Claude Code:**
+
 Install via the Plaited marketplace:
 
 ```bash
