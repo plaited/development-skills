@@ -26,6 +26,7 @@ const { values, positionals } = parseArgs({
     graph: { type: 'boolean', short: 'g' },
     reverse: { type: 'boolean', short: 'r' },
     tree: { type: 'boolean', short: 't' },
+    debug: { type: 'boolean', short: 'd' },
     help: { type: 'boolean', short: 'h' },
   },
   allowPositionals: true,
@@ -42,6 +43,7 @@ Options:
   --graph, -g        Show full dependency graph with exports
   --reverse, -r      Show reverse dependencies (what imports this file)
   --tree, -t         Show dependency tree with exports
+  --debug, -d        Enable debug logging
   --help, -h         Show this help
 
 Examples:
@@ -50,9 +52,10 @@ Examples:
   bun scan-module.ts src/config.ts -r          # Find what imports this
   bun scan-module.ts src/app.ts -t             # Dependency tree with exports
 `)
-  process.exit(0)
+  process.exit(values.help ? 0 : 1)
 }
 
+// Safe: positionals.length >= 1 guaranteed by exit above, but TypeScript can't infer through process.exit()
 const filePath = positionals[0]!
 const absolutePath = await resolveFilePath(filePath)
 
@@ -79,7 +82,7 @@ type DependencyTree = {
   children: Array<{ import: string } & DependencyTree>
 }
 
-const scanFile = async (path: string): Promise<ScanResult> => {
+const scanFile = async (path: string, debug = false): Promise<ScanResult> => {
   try {
     const file = Bun.file(path)
     if (!(await file.exists())) {
@@ -101,7 +104,10 @@ const scanFile = async (path: string): Promise<ScanResult> => {
       })),
       exports: result.exports,
     }
-  } catch {
+  } catch (error) {
+    if (debug) {
+      console.error(`[DEBUG] Failed to scan ${path}: ${error}`)
+    }
     return { imports: [], exports: [] }
   }
 }
@@ -111,13 +117,14 @@ const buildDependencyGraph = async (
   visited = new Set<string>(),
   depth = 0,
   maxDepth = 10,
+  debug = false,
 ): Promise<DependencyGraph> => {
   if (visited.has(path) || depth > maxDepth) {
     return { file: path, imports: [], exports: [] }
   }
 
   visited.add(path)
-  const { imports, exports } = await scanFile(path)
+  const { imports, exports } = await scanFile(path, debug)
   const dependencies = new Map<string, DependencyGraph>()
 
   for (const imp of imports) {
@@ -129,23 +136,28 @@ const buildDependencyGraph = async (
     try {
       // Resolve relative imports
       const resolved = await resolveFilePath(imp.path, path)
-      const childGraph = await buildDependencyGraph(resolved, visited, depth + 1, maxDepth)
+      const childGraph = await buildDependencyGraph(resolved, visited, depth + 1, maxDepth, debug)
       dependencies.set(imp.path, childGraph)
-    } catch {
-      // Skip unresolvable imports
+    } catch (error) {
+      if (debug) {
+        console.error(`[DEBUG] Failed to resolve import ${imp.path} from ${path}: ${error}`)
+      }
     }
   }
 
   return { file: path, imports, exports, dependencies }
 }
 
-const findReverseDependencies = async (targetPath: string): Promise<Array<{ file: string; imports: ImportInfo[] }>> => {
+const findReverseDependencies = async (
+  targetPath: string,
+  debug = false,
+): Promise<Array<{ file: string; imports: ImportInfo[] }>> => {
   const glob = new Glob('**/*.{ts,tsx,js,jsx}')
   const reverseDeps: Array<{ file: string; imports: ImportInfo[] }> = []
   const cwd = process.cwd()
 
   for await (const filePath of glob.scan({ cwd, absolute: true })) {
-    const { imports } = await scanFile(filePath)
+    const { imports } = await scanFile(filePath, debug)
 
     for (const imp of imports) {
       try {
@@ -154,8 +166,10 @@ const findReverseDependencies = async (targetPath: string): Promise<Array<{ file
           reverseDeps.push({ file: filePath, imports })
           break
         }
-      } catch {
-        // Skip unresolvable imports
+      } catch (error) {
+        if (debug) {
+          console.error(`[DEBUG] Failed to resolve import ${imp.path} from ${filePath}: ${error}`)
+        }
       }
     }
   }
@@ -176,6 +190,8 @@ const graphToTree = (graph: DependencyGraph, depth = 0): DependencyTree => {
   }
 }
 
+const debug = values.debug ?? false
+
 try {
   const file = Bun.file(absolutePath)
   if (!(await file.exists())) {
@@ -184,7 +200,7 @@ try {
   }
 
   if (values.reverse) {
-    const reverseDeps = await findReverseDependencies(absolutePath)
+    const reverseDeps = await findReverseDependencies(absolutePath, debug)
     console.log(
       JSON.stringify(
         {
@@ -200,7 +216,7 @@ try {
       ),
     )
   } else if (values.graph || values.tree) {
-    const graph = await buildDependencyGraph(absolutePath)
+    const graph = await buildDependencyGraph(absolutePath, new Set(), 0, 10, debug)
     const output = values.tree ? graphToTree(graph) : graph
 
     console.log(
@@ -221,7 +237,7 @@ try {
     )
   } else {
     // Default: show imports and exports
-    const { imports, exports } = await scanFile(absolutePath)
+    const { imports, exports } = await scanFile(absolutePath, debug)
     console.log(
       JSON.stringify(
         {

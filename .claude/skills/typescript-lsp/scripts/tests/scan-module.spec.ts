@@ -85,7 +85,7 @@ describe('scan-module', () => {
 
     const exitCode = await proc.exited
 
-    expect(exitCode).toBe(0) // Shows help instead of erroring
+    expect(exitCode).toBe(1) // Exits with error when file argument is missing
   })
 
   test('handles files with no imports', async () => {
@@ -97,5 +97,75 @@ describe('scan-module', () => {
     expect(result.exports).toBeDefined()
     expect(result.importCount).toBeGreaterThanOrEqual(0)
     expect(result.exportCount).toBeGreaterThanOrEqual(0)
+  })
+
+  test('handles circular dependencies without infinite loop', async () => {
+    const circularFile = join(import.meta.dir, 'fixtures/circular-entry.ts')
+    const result = await $`bun ${scriptsDir}/scan-module.ts ${circularFile} --graph`.json()
+
+    expect(result.file).toEndWith('circular-entry.ts')
+    expect(result.graph).toBeDefined()
+    expect(result.graph.file).toBeDefined()
+    expect(result.graph.imports).toBeDefined()
+    expect(result.graph.dependencies).toBeDefined()
+
+    // Verify the command completes (doesn't hang) and returns valid structure
+    // The maxDepth limit prevents infinite recursion
+    const deps = result.graph.dependencies
+    expect(deps).toBeDefined()
+  })
+
+  test('circular dependencies are handled with maxDepth limit', async () => {
+    const circularFile = join(import.meta.dir, 'fixtures/circular-a.ts')
+    const result = await $`bun ${scriptsDir}/scan-module.ts ${circularFile} --graph`.json()
+
+    expect(result.file).toEndWith('circular-a.ts')
+    expect(result.graph).toBeDefined()
+
+    // The graph should be built successfully without hanging
+    // maxDepth=10 prevents infinite recursion through circular imports
+    expect(result.graph.file).toContain('circular-a.ts')
+  })
+
+  test('scans .tsx files correctly', async () => {
+    const tsxFile = join(import.meta.dir, 'fixtures/sample.tsx')
+    const result = await $`bun ${scriptsDir}/scan-module.ts ${tsxFile}`.json()
+
+    expect(result.file).toEndWith('sample.tsx')
+    expect(result.imports).toBeDefined()
+    expect(result.exports).toBeDefined()
+    expect(Array.isArray(result.imports)).toBe(true)
+    expect(Array.isArray(result.exports)).toBe(true)
+  })
+
+  test('scans .js files correctly', async () => {
+    const jsFile = join(import.meta.dir, 'fixtures/sample.js')
+    const result = await $`bun ${scriptsDir}/scan-module.ts ${jsFile}`.json()
+
+    expect(result.file).toEndWith('sample.js')
+    expect(result.imports).toBeDefined()
+    expect(result.exports).toBeDefined()
+    expect(result.exportCount).toBeGreaterThan(0) // Should have add and multiply exports
+  })
+
+  test('scans .jsx files correctly', async () => {
+    const jsxFile = join(import.meta.dir, 'fixtures/sample.jsx')
+    const result = await $`bun ${scriptsDir}/scan-module.ts ${jsxFile}`.json()
+
+    expect(result.file).toEndWith('sample.jsx')
+    expect(result.imports).toBeDefined()
+    expect(result.exports).toBeDefined()
+    expect(Array.isArray(result.exports)).toBe(true)
+  })
+
+  test('handles mixed file extensions in dependency graph', async () => {
+    // Test that the loader correctly handles different file extensions
+    // when building a dependency graph
+    const tsFile = join(scriptsDir, 'lsp-client.ts')
+    const result = await $`bun ${scriptsDir}/scan-module.ts ${tsFile} --graph`.json()
+
+    expect(result.graph).toBeDefined()
+    expect(result.graph.file).toBeDefined()
+    // Should successfully process the file and any dependencies
   })
 })

@@ -1,4 +1,4 @@
-import { dirname } from 'node:path'
+import { dirname, join } from 'node:path'
 
 /**
  * Resolve a file path to an absolute path
@@ -22,7 +22,7 @@ export const resolveFilePath = async (filePath: string, basePath?: string): Prom
 
   // Relative path from base
   if (filePath.startsWith('.')) {
-    return `${base}/${filePath}`
+    return join(base, filePath)
   }
 
   // Try package export path resolution

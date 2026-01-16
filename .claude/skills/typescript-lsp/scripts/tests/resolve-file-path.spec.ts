@@ -11,7 +11,8 @@ describe('resolveFilePath', () => {
   test('resolves relative path from cwd', async () => {
     const relativePath = './plugin/skills/typescript-lsp/scripts/tests/fixtures/sample.ts'
     const result = await resolveFilePath(relativePath)
-    expect(result).toBe(`${process.cwd()}/${relativePath}`)
+    // path.join normalizes by removing './' prefix
+    expect(result).toBe(`${process.cwd()}/plugin/skills/typescript-lsp/scripts/tests/fixtures/sample.ts`)
   })
 
   test('resolves package export path via Bun.resolve', async () => {
@@ -28,7 +29,8 @@ describe('resolveFilePath', () => {
     const invalidPath = 'nonexistent-package/file.ts'
     const result = await resolveFilePath(invalidPath)
 
-    expect(result).toBe(`${process.cwd()}/${invalidPath}`)
+    // Falls back to joining with cwd
+    expect(result).toBe(`${process.cwd()}/nonexistent-package/file.ts`)
   })
 
   test('resolves relative path from basePath', async () => {
@@ -36,7 +38,8 @@ describe('resolveFilePath', () => {
     const relativePath = './utils.ts'
     const result = await resolveFilePath(relativePath, basePath)
 
-    expect(result).toBe('/Users/test/src/./utils.ts')
+    // path.join normalizes by removing './' prefix
+    expect(result).toBe('/Users/test/src/utils.ts')
   })
 
   test('resolves parent relative path from basePath', async () => {
@@ -44,7 +47,8 @@ describe('resolveFilePath', () => {
     const relativePath = '../utils.ts'
     const result = await resolveFilePath(relativePath, basePath)
 
-    expect(result).toBe('/Users/test/src/deep/../utils.ts')
+    // path.join normalizes by resolving '../' sequences
+    expect(result).toBe('/Users/test/src/utils.ts')
   })
 
   test('ignores basePath for absolute paths', async () => {
@@ -59,6 +63,7 @@ describe('resolveFilePath', () => {
     const relativePath = './file.ts'
     const result = await resolveFilePath(relativePath)
 
-    expect(result).toBe(`${process.cwd()}/${relativePath}`)
+    // path.join normalizes by removing './' prefix
+    expect(result).toBe(`${process.cwd()}/file.ts`)
   })
 })
