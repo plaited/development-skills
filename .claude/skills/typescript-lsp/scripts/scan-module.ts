@@ -73,6 +73,12 @@ type DependencyGraph = {
   dependencies?: Map<string, DependencyGraph>
 }
 
+type DependencyTree = {
+  file: string
+  imports: ImportInfo[]
+  children: Array<{ import: string } & DependencyTree>
+}
+
 const scanFile = async (path: string): Promise<ScanResult> => {
   try {
     const file = Bun.file(path)

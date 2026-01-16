@@ -7,7 +7,7 @@
     "indentWidth": 2,
     "lineEnding": "lf",
     "lineWidth": 120,
-    "includes": ["**", "./.claude/**/*"]
+    "includes": ["**", ".claude"]
   },
   "linter": {
     "enabled": true,
@@ -31,18 +31,13 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noConsole": {
-          "level": "warn",
-          "options": {
-            "allow": ["error", "warn", "info"]
-          }
-        }
+        "noConsole": "off"
       },
       "complexity": {
         "useLiteralKeys": "warn"
       }
     },
-    "includes": ["**", "./.claude/**/*"]
+    "includes": ["**", ".claude"]
   },
   "javascript": {
     "formatter": {
@@ -60,17 +55,6 @@
         "rules": {
           "complexity": { "noArguments": "error" },
           "style": { "useConst": "error" }
-        }
-      }
-    },
-    {
-      "includes": ["**/tests/**/*", "./.claude/**/*"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "warn",
-            "noConsole": "off"
-          }
         }
       }
     }
