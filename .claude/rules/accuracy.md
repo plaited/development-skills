@@ -1,6 +1,6 @@
 <!--
 RULE TEMPLATE - Distributed via /scaffold-rules
-Variables: {{LINK:testing}}, {{#if development-skills}}, {{#if agent:claude}}
+Variables: {{LINK:testing}}, {{#if development-skills}}, {{#if supports-slash-commands}}
 -->
 
 # Accuracy and Confidence Standards
@@ -30,10 +30,12 @@ Variables: {{LINK:testing}}, {{#if development-skills}}, {{#if agent:claude}}
 4. **Tool-Assisted Verification**: Use available tools to enhance verification accuracy:
 {{#if development-skills}}
    - **TypeScript LSP tools** (when available): Use for type-aware analysis of `.ts`, `.tsx`, `.js`, `.jsx` files
-{{#if agent:claude}}
+{{/if}}
+{{#if supports-slash-commands}}
      - Available via `/lsp-hover`, `/lsp-find`, `/lsp-refs`, `/lsp-analyze` commands
 {{/if}}
-{{^if agent:claude}}
+{{^if supports-slash-commands}}
+{{#if development-skills}}
      - Available via `bunx @plaited/development-skills lsp-*` commands
 {{/if}}
 {{/if}}

@@ -46,8 +46,10 @@ Determine target rules location based on agent environment:
 Check for existing agent configuration files:
 ```
 .claude/          → Claude Code (.claude/rules/)
-.cursorrules      → Cursor (.cursorrules or .cursor/rules/)
 .cursor/rules/    → Cursor (multi-file)
+.factory/rules/   → Factory (multi-file)
+.plaited/rules/   → AGENTS.md compatible (universal)
+AGENTS.md         → Universal fallback (links to .plaited/rules/)
 .github/copilot-instructions.md → GitHub Copilot
 .windsurfrules    → Windsurf
 .clinerules       → Cline/Roo
@@ -182,12 +184,35 @@ bunx @plaited/development-skills scaffold-rules --format=json
 
 # Specify agent
 bunx @plaited/development-skills scaffold-rules --agent=cursor --format=json
+bunx @plaited/development-skills scaffold-rules --agent=factory --format=json
+
+# Universal AGENTS.md format (works with most agents)
+bunx @plaited/development-skills scaffold-rules --agent=agents-md --format=json
 
 # Filter specific rules
 bunx @plaited/development-skills scaffold-rules --rules testing --rules bun-apis
 ```
 
 **Options:**
-- `--agent` / `-a`: Target agent (claude, cursor, copilot, windsurf, cline, aider)
+- `--agent` / `-a`: Target agent (claude, cursor, factory, copilot, windsurf, cline, aider, agents-md)
 - `--format` / `-f`: Output format (json)
 - `--rules` / `-r`: Specific rules to include (can be used multiple times)
+
+**Output Structure:**
+The JSON output includes metadata about the target agent:
+```json
+{
+  "agent": "agents-md",
+  "rulesPath": ".plaited/rules",
+  "format": "agents-md",
+  "supportsAgentsMd": true,
+  "agentsMdContent": "# AGENTS.md\n...",
+  "templates": { ... }
+}
+```
+
+For `agents-md` format, write:
+1. Individual rule files to `.plaited/rules/`
+2. The `agentsMdContent` to `AGENTS.md` in project root
+
+This provides maximum portability - rules work with any AGENTS.md-compatible agent.

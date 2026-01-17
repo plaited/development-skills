@@ -1,20 +1,20 @@
 <!--
 RULE TEMPLATE - Distributed via /scaffold-rules
-Variables: {{#if agent:claude}}
+Variables: {{#if has-sandbox}}, {{#if supports-slash-commands}}
 -->
 
 # Git Workflow
 
 ## Commit Message Format
 
-{{#if agent:claude}}
+{{#if has-sandbox}}
 When creating commits with multi-line messages, use single-quoted strings instead of heredocs. The sandbox environment restricts temp file creation needed for heredocs.
 {{/if}}
-{{^if agent:claude}}
+{{^if has-sandbox}}
 Use multi-line commit messages for detailed changes:
 {{/if}}
 
-{{#if agent:claude}}
+{{#if has-sandbox}}
 ```bash
 # ✅ CORRECT: Single-quoted multi-line string
 git commit -m 'refactor: description here
@@ -37,7 +37,7 @@ The heredoc approach fails with:
 (eval):1: can't create temp file for here document: operation not permitted
 ```
 {{/if}}
-{{^if agent:claude}}
+{{^if has-sandbox}}
 ```bash
 git commit -m "refactor: description here
 

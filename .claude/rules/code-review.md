@@ -1,6 +1,6 @@
 <!--
 RULE TEMPLATE - Distributed via /scaffold-rules
-Variables: {{#if development-skills}}, {{#if agent:claude}}
+Variables: {{#if development-skills}}, {{#if supports-slash-commands}}
 -->
 
 # Code Review Standards
@@ -13,16 +13,16 @@ Before completing a code review, run these validation scripts:
 
 ### AgentSkills Validation
 
-When working with AgentSkills directories (`.claude/skills/`, `.cursor/skills/`, etc.):
+When working with AgentSkills directories (`.claude/skills/`, `.cursor/skills/`, `.factory/skills/`, etc.):
 
 {{#if development-skills}}
 **Validate structure:**
-{{#if agent:claude}}
+{{#if supports-slash-commands}}
 ```
 /validate-skill <path>
 ```
 {{/if}}
-{{^if agent:claude}}
+{{^if supports-slash-commands}}
 ```bash
 bunx @plaited/development-skills validate-skill <path>
 ```
