@@ -1,6 +1,6 @@
 ---
 description: Get TypeScript type information at a specific position in a file
-allowed-tools: Bash, Glob
+allowed-tools: Bash
 ---
 
 # LSP Hover
@@ -32,23 +32,14 @@ Usage: /lsp-hover <file> <line> <char>
 Example: /lsp-hover src/utils/parser.ts 42 15
 ```
 
-### Step 2: Locate typescript-lsp Skill
+### Step 2: Run LSP Hover
 
-Find the typescript-lsp skill directory. Use Glob to locate it:
-```glob
-**/typescript-lsp/SKILL.md
-```
-
-The skill directory is the parent of SKILL.md.
-
-### Step 3: Run LSP Hover
-
-From the skill directory, run:
+Execute the development-skills CLI command:
 ```bash
-bun <skill-dir>/scripts/lsp-hover.ts <file> <line> <char>
+bunx @plaited/development-skills lsp-hover <file> <line> <char>
 ```
 
-### Step 4: Format Output
+### Step 3: Format Output
 
 Parse the JSON output and present the type information in a readable format:
 

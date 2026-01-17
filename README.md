@@ -1,26 +1,70 @@
 # development-skills
 
-Development skills for Claude Code - TypeScript LSP, code documentation, and validation tools.
+TypeScript LSP, code documentation, and validation tools. Available as both a CLI tool and as installable skills for AI coding agents.
 
-## Installation
+## CLI Tool
 
-**Claude Code:**
-
-Install via the Plaited marketplace:
+Use these tools directly via the CLI without installation:
 
 ```bash
-/plugin marketplace add plaited/marketplace
+# Run without installing
+bunx @plaited/development-skills lsp-hover src/index.ts 10 5
+
+# Or install globally
+bun add -g @plaited/development-skills
+development-skills lsp-find parseConfig
 ```
 
-**Other AI coding agents:**
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `lsp-hover <file> <line> <char>` | Get type information at position |
+| `lsp-find <query> [file]` | Search for symbols across workspace |
+| `lsp-refs <file> <line> <char>` | Find all references to symbol |
+| `lsp-analyze <file> [options]` | Batch analysis of file |
+| `validate-skill <path>` | Validate AgentSkills spec |
+
+### Examples
+
+```bash
+# Type information
+bunx @plaited/development-skills lsp-hover src/app.ts 25 10
+
+# Symbol search
+bunx @plaited/development-skills lsp-find UserConfig
+
+# Find references
+bunx @plaited/development-skills lsp-refs src/types.ts 15 8
+
+# Module analysis
+bunx @plaited/development-skills lsp-analyze src/index.ts --all
+
+# Validate skills
+bunx @plaited/development-skills validate-skill .claude/skills
+```
+
+## Skills for AI Agents
+
+**Install skills** for use with AI coding agents:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- --agent <agent-name> --plugin development-skills
-
-Supported agents: gemini, copilot, cursor, opencode, amp, goose, factory
 ```
 
-## Skills
+Replace `<agent-name>` with your agent: `claude`, `cursor`, `copilot`, `opencode`, `amp`, `goose`, `factory`
+
+**Update skills:**
+
+```bash
+# Full replace
+curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- update --agent <agent-name> --plugin development-skills
+
+# Agent-assisted merge
+curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- merge --agent <agent-name> --plugin development-skills
+```
+
+### Available Skills
 
 ### TypeScript LSP
 
@@ -75,6 +119,21 @@ All commands accept:
 - **Absolute paths**: `/Users/name/project/src/file.ts`
 - **Relative paths**: `./src/file.ts`
 - **Package export paths**: `my-package/src/module.ts` (resolved via `Bun.resolve()`)
+
+### Skill Validation
+
+Validate skill directories against the AgentSkills specification.
+
+#### Commands
+
+##### `/validate-skill`
+
+Validate skill directories.
+
+```bash
+/validate-skill .claude/skills
+/validate-skill .claude/skills/typescript-lsp
+```
 
 ## Development
 

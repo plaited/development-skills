@@ -68,7 +68,7 @@ Package export paths are recommended for portability and consistency with the pa
 Get type information at a specific position.
 
 ```bash
-bun scripts/lsp-hover.ts <file> <line> <char>
+bunx @plaited/development-skills lsp-hover <file> <line> <char>
 ```
 
 **Arguments:**
@@ -78,38 +78,38 @@ bun scripts/lsp-hover.ts <file> <line> <char>
 
 **Example:**
 ```bash
-bun scripts/lsp-hover.ts src/utils/parser.ts 42 10
+bunx @plaited/development-skills lsp-hover src/utils/parser.ts 42 10
 ```
 
 #### lsp-symbols
 List all symbols in a file.
 
 ```bash
-bun scripts/lsp-symbols.ts <file>
+bunx @plaited/development-skills lsp-symbols <file>
 ```
 
 **Example:**
 ```bash
-bun scripts/lsp-symbols.ts src/utils/parser.ts
+bunx @plaited/development-skills lsp-symbols src/utils/parser.ts
 ```
 
 #### lsp-references
 Find all references to a symbol.
 
 ```bash
-bun scripts/lsp-references.ts <file> <line> <char>
+bunx @plaited/development-skills lsp-refs <file> <line> <char>
 ```
 
 **Example:**
 ```bash
-bun scripts/lsp-references.ts src/utils/parser.ts 42 10
+bunx @plaited/development-skills lsp-refs src/utils/parser.ts 42 10
 ```
 
 #### lsp-find
 Search for symbols across the workspace.
 
 ```bash
-bun scripts/lsp-find.ts <query> [context-file]
+bunx @plaited/development-skills lsp-find <query> [context-file]
 ```
 
 **Arguments:**
@@ -118,8 +118,8 @@ bun scripts/lsp-find.ts <query> [context-file]
 
 **Example:**
 ```bash
-bun scripts/lsp-find.ts parseConfig
-bun scripts/lsp-find.ts validateInput src/lib/validator.ts
+bunx @plaited/development-skills lsp-find parseConfig
+bunx @plaited/development-skills lsp-find validateInput src/lib/validator.ts
 ```
 
 ### Batch Script
@@ -128,7 +128,7 @@ bun scripts/lsp-find.ts validateInput src/lib/validator.ts
 Perform multiple analyses in a single session for efficiency.
 
 ```bash
-bun scripts/lsp-analyze.ts <file> [options]
+bunx @plaited/development-skills lsp-analyze <file> [options]
 ```
 
 **Options:**
@@ -141,13 +141,13 @@ bun scripts/lsp-analyze.ts <file> [options]
 **Examples:**
 ```bash
 # Get file overview
-bun scripts/lsp-analyze.ts src/utils/parser.ts --all
+bunx @plaited/development-skills lsp-analyze src/utils/parser.ts --all
 
 # Check multiple positions
-bun scripts/lsp-analyze.ts src/utils/parser.ts --hover 50:10 --hover 75:5
+bunx @plaited/development-skills lsp-analyze src/utils/parser.ts --hover 50:10 --hover 75:5
 
 # Before refactoring: find all references
-bun scripts/lsp-analyze.ts src/utils/parser.ts --refs 42:10
+bunx @plaited/development-skills lsp-analyze src/utils/parser.ts --refs 42:10
 ```
 
 ## Common Workflows
@@ -156,17 +156,17 @@ bun scripts/lsp-analyze.ts src/utils/parser.ts --refs 42:10
 
 ```bash
 # 1. Get exports overview
-bun scripts/lsp-analyze.ts path/to/file.ts --exports
+bunx @plaited/development-skills lsp-analyze path/to/file.ts --exports
 
 # 2. For specific type info, hover on interesting symbols
-bun scripts/lsp-hover.ts path/to/file.ts <line> <char>
+bunx @plaited/development-skills lsp-hover path/to/file.ts <line> <char>
 ```
 
 ### Before Modifying an Export
 
 ```bash
 # 1. Find all references first
-bun scripts/lsp-references.ts path/to/file.ts <line> <char>
+bunx @plaited/development-skills lsp-refs path/to/file.ts <line> <char>
 
 # 2. Check what depends on it
 # Review the output to understand impact
@@ -176,15 +176,15 @@ bun scripts/lsp-references.ts path/to/file.ts <line> <char>
 
 ```bash
 # Search for similar implementations
-bun scripts/lsp-find.ts handleRequest
-bun scripts/lsp-find.ts parseConfig
+bunx @plaited/development-skills lsp-find handleRequest
+bunx @plaited/development-skills lsp-find parseConfig
 ```
 
 ### Pre-Implementation Verification
 
 ```bash
 # Before writing code that uses an API, verify its signature
-bun scripts/lsp-hover.ts path/to/api.ts <line> <char>
+bunx @plaited/development-skills lsp-hover path/to/api.ts <line> <char>
 ```
 
 ## Output Format

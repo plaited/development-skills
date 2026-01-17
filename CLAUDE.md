@@ -4,7 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This repository hosts the **development-skills** Claude Code plugin, providing development tools including TypeScript LSP integration, code documentation utilities, and skill validation.
+This repository provides the **@plaited/development-skills** package with dual distribution:
+
+1. **CLI Tool** - TypeScript LSP integration, code documentation, and skill validation via `bunx @plaited/development-skills`
+2. **AI Agent Skills** - Installable skills for Claude Code and other AI coding agents via marketplace
+
+The package provides development tools including TypeScript LSP integration, code documentation utilities, and skill validation.
 
 ## Essential Commands
 
@@ -36,9 +41,9 @@ This project uses `.claude/rules/` for project-specific guidance:
 
 ## Quick Reference
 
-### Plugin Overview
+### Package Overview
 
-This repository hosts the **development-skills** Claude Code plugin with the following skills:
+This repository provides the **@plaited/development-skills** package with the following capabilities:
 
 **TypeScript LSP** (`/lsp-*` commands):
 - `/lsp-hover` - Get type information at a position
@@ -62,20 +67,31 @@ This repository hosts the **development-skills** Claude Code plugin with the fol
 
 For complete conventions, see `.claude/rules/code-review.md`
 
-### Plugin Development
+### Package Structure
 
-This project is a Claude Code plugin. Structure:
+This project has dual distribution (CLI + AI agent skills):
+
+**CLI Tool:**
+- `bin/cli.ts` - CLI entry point with command routing
+- `src/` - TypeScript source files (LSP, validation, utilities)
+- `package.json` - Defines `bin` entry for CLI execution
+
+**AI Agent Skills:**
 - `.claude/skills/typescript-lsp/` - TypeScript LSP skill
 - `.claude/skills/code-documentation/` - Code documentation skill
 - `.claude/skills/validate-skill/` - Skill validation skill
 - `.claude/skills/scaffold-rules/` - Scaffold development rules skill
-- `.claude/commands/` - Slash command definitions
+- `.claude/commands/` - Slash command definitions (use CLI under the hood)
 - `.claude/rules/` - Development guidance (not published)
 
-When working on the plugin:
-- Clear cache after changes: `rm -rf ~/.claude/plugins-cache`
-- Restart Claude Code to see updates
-- Skills are auto-invoked (won't show in `/plugins` UI)
+**Distribution:**
+- CLI: Published to npm, usable via `bunx @plaited/development-skills`
+- Skills: Installed via marketplace curl script to `.claude/skills/` for AI agents
+
+When working on the package:
+- Test CLI: `bun bin/cli.ts <command>`
+- Test skills: Commands in `.claude/commands/*.md` call the CLI
+- All skills use the CLI tools, not local scripts
 
 ### Documentation
 
@@ -91,25 +107,35 @@ When working on the plugin:
 2. **Bun Required**: Development requires bun >= v1.2.9
 3. **ES2024 Features**: Uses modern APIs
 
-## Plugin
+## CLI Commands
 
-The **development-skills** plugin provides:
+The **@plaited/development-skills** CLI provides:
 
-**TypeScript LSP** (`.claude/skills/typescript-lsp/`):
-- Type-aware symbol search across workspace
-- Hover information (type signatures, docs)
-- Reference finding before refactoring
-- Batch analysis for efficiency
+**TypeScript LSP** (`lsp-*` commands):
+- `lsp-hover` - Type-aware hover information (type signatures, docs)
+- `lsp-find` - Symbol search across workspace
+- `lsp-refs` - Reference finding before refactoring
+- `lsp-analyze` - Batch analysis for efficiency
 
-**Code Documentation** (`.claude/skills/code-documentation/`):
-- Documentation generation utilities
-
-**Skill Validation** (`.claude/skills/validate-skill/`):
+**Skill Validation** (`validate-skill` command):
 - Validate skills against AgentSkills spec
 
-**Scaffold Rules** (`.claude/skills/scaffold-rules/`):
-- Scaffold development rules for AI coding agents
+**Usage:**
+```bash
+# Direct CLI usage
+bunx @plaited/development-skills lsp-hover src/app.ts 25 10
+bunx @plaited/development-skills lsp-find UserConfig
+bunx @plaited/development-skills validate-skill .claude/skills
 
-Install via marketplace: `github:plaited/marketplace`
+# Or install globally
+bun add -g @plaited/development-skills
+development-skills lsp-hover src/app.ts 25 10
+```
 
-See individual skill SKILL.md files for complete documentation.
+**AI Agent Skills:**
+Skills can be installed for AI coding agents (Claude Code, Cursor, etc.) via marketplace:
+```bash
+curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- --agent claude --plugin development-skills
+```
+
+See individual skill SKILL.md files in `.claude/skills/` for complete documentation.

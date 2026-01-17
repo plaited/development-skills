@@ -24,7 +24,7 @@ This skill validates skill directories against the [AgentSkills specification](h
 Validate one or more skill directories.
 
 ```bash
-bun scripts/validate-skill.ts [paths...]
+bunx @plaited/development-skills validate-skill [paths...]
 ```
 
 **Arguments:**
@@ -37,13 +37,13 @@ bun scripts/validate-skill.ts [paths...]
 
 ```bash
 # Validate all skills in .claude/skills/
-bun scripts/validate-skill.ts
+bunx @plaited/development-skills validate-skill
 
 # Validate a specific skill
-bun scripts/validate-skill.ts .claude/skills/typescript-lsp
+bunx @plaited/development-skills validate-skill .claude/skills/typescript-lsp
 
 # Validate multiple paths with JSON output
-bun scripts/validate-skill.ts .claude/skills/typescript-lsp .claude/skills/code-documentation --json
+bunx @plaited/development-skills validate-skill .claude/skills/typescript-lsp .claude/skills/code-documentation --json
 ```
 
 ## Validation Rules

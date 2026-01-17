@@ -73,6 +73,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["bin/**/*", "src/**/*"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
     }
   ],
   "assist": {

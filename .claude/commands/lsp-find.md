@@ -1,6 +1,6 @@
 ---
 description: Search for TypeScript symbols across the workspace by name
-allowed-tools: Bash, Glob
+allowed-tools: Bash
 ---
 
 # LSP Find
@@ -33,23 +33,14 @@ Examples:
   /lsp-find useTemplate src/main/use-template.ts
 ```
 
-### Step 2: Locate typescript-lsp Skill
+### Step 2: Run LSP Find
 
-Find the typescript-lsp skill directory. Use Glob to locate it:
-```glob
-**/typescript-lsp/SKILL.md
-```
-
-The skill directory is the parent of SKILL.md.
-
-### Step 3: Run LSP Find
-
-From the skill directory, run:
+Execute the development-skills CLI command:
 ```bash
-bun <skill-dir>/scripts/lsp-find.ts <query> [context-file]
+bunx @plaited/development-skills lsp-find <query> [context-file]
 ```
 
-### Step 4: Format Output
+### Step 3: Format Output
 
 Parse the JSON output and present results as a table:
 

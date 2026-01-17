@@ -259,7 +259,7 @@ const findSkillMd = async (skillDir: string): Promise<string | null> => {
  * @param skillDir - Path to the skill directory
  * @returns Validation result with errors and warnings
  */
-const validateSkill = async (skillDir: string): Promise<ValidationResult> => {
+const validateSkillDirectory = async (skillDir: string): Promise<ValidationResult> => {
   const result: ValidationResult = {
     valid: false,
     path: skillDir,
@@ -390,84 +390,95 @@ const validateSkills = async (rootDir: string): Promise<ValidationResult[]> => {
   const results: ValidationResult[] = []
 
   for (const skillDir of skillDirs) {
-    results.push(await validateSkill(skillDir))
+    results.push(await validateSkillDirectory(skillDir))
   }
 
   return results
 }
 
-// Parse CLI arguments
-const { values, positionals } = parseArgs({
-  args: Bun.argv.slice(2),
-  options: {
-    json: {
-      type: 'boolean',
-      default: false,
+/**
+ * Validate skill directories against AgentSkills specification
+ *
+ * @param args - Command line arguments
+ */
+export const validateSkill = async (args: string[]) => {
+  const { values, positionals } = parseArgs({
+    args,
+    options: {
+      json: {
+        type: 'boolean',
+        default: false,
+      },
     },
-  },
-  allowPositionals: true,
-})
+    allowPositionals: true,
+  })
 
-const cwd = process.cwd()
-const searchPaths = positionals.length > 0 ? positionals : [join(cwd, '.claude/skills')]
+  const cwd = process.cwd()
+  const searchPaths = positionals.length > 0 ? positionals : [join(cwd, '.claude/skills')]
 
-const allResults: ValidationResult[] = []
+  const allResults: ValidationResult[] = []
 
-for (const searchPath of searchPaths) {
-  const fullPath = searchPath.startsWith('/') ? searchPath : join(cwd, searchPath)
+  for (const searchPath of searchPaths) {
+    const fullPath = searchPath.startsWith('/') ? searchPath : join(cwd, searchPath)
 
-  // Check if path is a skill directory or a directory containing skills
-  const skillMdPath = await findSkillMd(fullPath)
+    // Check if path is a skill directory or a directory containing skills
+    const skillMdPath = await findSkillMd(fullPath)
 
-  if (skillMdPath) {
-    // Direct skill directory
-    allResults.push(await validateSkill(fullPath))
-  } else {
-    // Directory containing skills
-    const results = await validateSkills(fullPath)
-    if (results.length > 0) {
-      allResults.push(...results)
+    if (skillMdPath) {
+      // Direct skill directory
+      allResults.push(await validateSkillDirectory(fullPath))
     } else {
-      // No nested skills found - validate path directly (will produce error)
-      allResults.push(await validateSkill(fullPath))
+      // Directory containing skills
+      const results = await validateSkills(fullPath)
+      if (results.length > 0) {
+        allResults.push(...results)
+      } else {
+        // No nested skills found - validate path directly (will produce error)
+        allResults.push(await validateSkillDirectory(fullPath))
+      }
+    }
+  }
+
+  if (values.json) {
+    console.log(JSON.stringify(allResults, null, 2))
+  } else {
+    // Human-readable output
+    let hasErrors = false
+
+    for (const result of allResults) {
+      const relativePath = result.path.replace(cwd, '').replace(/^\//, '')
+
+      if (result.valid) {
+        console.log(`✓ ${relativePath}`)
+      } else {
+        console.log(`✗ ${relativePath}`)
+        hasErrors = true
+      }
+
+      for (const error of result.errors) {
+        console.log(`  ERROR: ${error}`)
+      }
+
+      for (const warning of result.warnings) {
+        console.log(`  WARN: ${warning}`)
+      }
+    }
+
+    if (allResults.length === 0) {
+      console.log('No skills found to validate')
+    } else {
+      const valid = allResults.filter((r) => r.valid).length
+      const total = allResults.length
+      console.log(`\n${valid}/${total} skills valid`)
+    }
+
+    if (hasErrors) {
+      process.exit(1)
     }
   }
 }
 
-if (values.json) {
-  console.log(JSON.stringify(allResults, null, 2))
-} else {
-  // Human-readable output
-  let hasErrors = false
-
-  for (const result of allResults) {
-    const relativePath = result.path.replace(cwd, '').replace(/^\//, '')
-
-    if (result.valid) {
-      console.log(`✓ ${relativePath}`)
-    } else {
-      console.log(`✗ ${relativePath}`)
-      hasErrors = true
-    }
-
-    for (const error of result.errors) {
-      console.log(`  ERROR: ${error}`)
-    }
-
-    for (const warning of result.warnings) {
-      console.log(`  WARN: ${warning}`)
-    }
-  }
-
-  if (allResults.length === 0) {
-    console.log('No skills found to validate')
-  } else {
-    const valid = allResults.filter((r) => r.valid).length
-    const total = allResults.length
-    console.log(`\n${valid}/${total} skills valid`)
-  }
-
-  if (hasErrors) {
-    process.exit(1)
-  }
+// Keep executable entry point for direct execution
+if (import.meta.main) {
+  await validateSkill(Bun.argv.slice(2))
 }

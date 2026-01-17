@@ -1,3 +1,8 @@
+<!--
+RULE TEMPLATE - Distributed via /scaffold-rules
+Variables: {{#if development-skills}}, {{#if agent:claude}}
+-->
+
 # Code Review Standards
 
 The following standards are not automatically enforced by Biome but should be checked during code review.
@@ -6,18 +11,35 @@ The following standards are not automatically enforced by Biome but should be ch
 
 Before completing a code review, run these validation scripts:
 
-### Plugin Skills Validation
+### AgentSkills Validation
 
-When changes touch `.claude/skills/`, validate against the AgentSkills spec by running:
+When working with AgentSkills directories (`.claude/skills/`, `.cursor/skills/`, etc.):
 
+{{#if development-skills}}
+**Validate structure:**
+{{#if agent:claude}}
 ```
-/validate-skill
+/validate-skill <path>
 ```
+{{/if}}
+{{^if agent:claude}}
+```bash
+bunx @plaited/development-skills validate-skill <path>
+```
+{{/if}}
 
 This checks:
-- SKILL.md exists and has required frontmatter
-- Scripts have proper structure
-- References are valid markdown files
+- SKILL.md exists with required frontmatter (name, description)
+- Proper naming conventions
+- Valid markdown references
+{{/if}}
+
+{{^if development-skills}}
+Manually verify:
+- SKILL.md exists with required frontmatter (name, description)
+- Directory name matches skill name
+- All referenced files exist
+{{/if}}
 
 ## TypeScript Style Conventions
 
