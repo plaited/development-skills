@@ -1,6 +1,6 @@
 {
   "name": "@plaited/development-skills",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "Development skills for Claude Code - TypeScript LSP, code documentation, and validation tools",
   "license": "ISC",
   "engines": {
