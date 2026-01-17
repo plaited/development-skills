@@ -49,7 +49,7 @@ bunx @plaited/development-skills validate-skill .claude/skills
 **Install skills** for use with AI coding agents:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- --agent <agent-name> --plugin development-skills
+curl -fsSL https://raw.githubusercontent.com/plaited/skills-installer/main/install.sh | bash -s -- --agent <agent-name> --project development-skills
 ```
 
 Replace `<agent-name>` with your agent: `claude`, `cursor`, `copilot`, `opencode`, `amp`, `goose`, `factory`
@@ -57,11 +57,7 @@ Replace `<agent-name>` with your agent: `claude`, `cursor`, `copilot`, `opencode
 **Update skills:**
 
 ```bash
-# Full replace
-curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- update --agent <agent-name> --plugin development-skills
-
-# Agent-assisted merge
-curl -fsSL https://raw.githubusercontent.com/plaited/marketplace/main/install.sh | bash -s -- merge --agent <agent-name> --plugin development-skills
+curl -fsSL https://raw.githubusercontent.com/plaited/skills-installer/main/install.sh | bash -s -- update --agent <agent-name> --project development-skills
 ```
 
 ### Available Skills
