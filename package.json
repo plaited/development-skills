@@ -1,12 +1,31 @@
 {
   "name": "@plaited/development-skills",
+  "version": "0.3.5",
   "description": "Development skills for Claude Code - TypeScript LSP, code documentation, and validation tools",
   "license": "ISC",
-  "private": true,
   "engines": {
     "bun": ">= v1.2.9"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plaited/development-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/plaited/development-skills/issues"
+  },
+  "homepage": "https://github.com/plaited/development-skills/tree/main#readme",
+  "bin": {
+    "development-skills": "./bin/cli.ts"
+  },
   "type": "module",
+  "files": [
+    "bin/",
+    "src/",
+    ".claude/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "check": "bun run check:biome && bun run check:types && bun run check:package",
     "check:biome": "biome check",
@@ -14,7 +33,7 @@
     "check:types": "tsc --noEmit",
     "check:write": "biome check --write && format-package --write",
     "prepare": "git config core.hooksPath .hooks || true",
-    "test": "bun test ./.claude"
+    "test": "bun test"
   },
   "lint-staged": {
     "*.{js,cjs,jsx,tsx,ts}": [
@@ -23,6 +42,9 @@
     "package.json": [
       "format-package"
     ]
+  },
+  "peerDependencies": {
+    "typescript-language-server": "^5.1.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",

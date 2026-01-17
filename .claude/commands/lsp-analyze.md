@@ -1,6 +1,6 @@
 ---
 description: Analyze a TypeScript file structure, exports, and symbols
-allowed-tools: Bash, Glob
+allowed-tools: Bash
 ---
 
 # LSP Analyze
@@ -40,23 +40,14 @@ Examples:
 
 Default to `--exports` if no options provided.
 
-### Step 2: Locate typescript-lsp Skill
+### Step 2: Run LSP Analyze
 
-Find the typescript-lsp skill directory. Use Glob to locate it:
-```glob
-**/typescript-lsp/SKILL.md
-```
-
-The skill directory is the parent of SKILL.md.
-
-### Step 3: Run LSP Analyze
-
-From the skill directory, run:
+Execute the development-skills CLI command:
 ```bash
-bun <skill-dir>/scripts/lsp-analyze.ts <file> [options]
+bunx @plaited/development-skills lsp-analyze <file> [options]
 ```
 
-### Step 4: Format Output
+### Step 3: Format Output
 
 Parse the JSON output and present in a structured format:
 

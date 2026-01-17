@@ -8,35 +8,7 @@
  * @internal
  */
 
-import { join } from 'node:path'
 import type { Subprocess } from 'bun'
-
-/**
- * Resolve typescript-language-server command
- *
- * Checks in this order:
- * 1. Local: node_modules/.bin/typescript-language-server
- * 2. Global: from PATH (via Bun.which)
- *
- * @throws Error if typescript-language-server is not found
- */
-const resolveTypeScriptLanguageServer = async (): Promise<string> => {
-  // Check local installation first
-  const localPath = join(process.cwd(), 'node_modules/.bin/typescript-language-server')
-  if (await Bun.file(localPath).exists()) {
-    return localPath
-  }
-
-  // Fall back to global installation
-  const globalPath = Bun.which('typescript-language-server')
-  if (globalPath) {
-    return globalPath
-  }
-
-  throw new Error(
-    'typescript-language-server not found. Install it locally (bun add -d typescript-language-server) or globally (bun add -g typescript-language-server)',
-  )
-}
 
 type JsonRpcRequest = {
   jsonrpc: '2.0'
@@ -75,26 +47,21 @@ export class LspClient {
   #contentLength = -1
   #initialized = false
   #rootUri: string
-  #serverCommand: string[] | null = null
+  #serverCommand: string[]
   #requestTimeout: number
-  #debug: boolean
-  #customCommand?: string[]
 
   constructor({
     rootUri,
-    command,
-    requestTimeout = 60000,
-    debug = false,
+    command = ['bun', 'typescript-language-server', '--stdio'],
+    requestTimeout = 30000,
   }: {
     rootUri: string
     command?: string[]
     requestTimeout?: number
-    debug?: boolean
   }) {
     this.#rootUri = rootUri
-    this.#customCommand = command
+    this.#serverCommand = command
     this.#requestTimeout = requestTimeout
-    this.#debug = debug
   }
 
   /**
@@ -103,19 +70,6 @@ export class LspClient {
   async start(): Promise<void> {
     if (this.#process) {
       throw new Error('LSP server already running')
-    }
-
-    // Resolve command if not already set
-    if (!this.#serverCommand) {
-      if (this.#customCommand) {
-        this.#serverCommand = this.#customCommand
-      } else {
-        const tsServerPath = await resolveTypeScriptLanguageServer()
-        this.#serverCommand = [tsServerPath, '--stdio']
-        if (this.#debug) {
-          console.error(`[LSP] Using typescript-language-server: ${tsServerPath}`)
-        }
-      }
     }
 
     this.#process = Bun.spawn(this.#serverCommand, {
@@ -174,19 +128,10 @@ export class LspClient {
       params: params ?? undefined,
     }
 
-    if (this.#debug) {
-      console.error(`[LSP] Request ${id}: ${method}`)
-    }
-
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.#pendingRequests.delete(id)
-        const suggestedTimeout = this.#requestTimeout * 2
-        reject(
-          new Error(
-            `LSP request timeout: ${method} (timeout=${this.#requestTimeout}ms). Try increasing timeout with --timeout ${suggestedTimeout}`,
-          ),
-        )
+        reject(new Error(`LSP request timeout: ${method} (id=${id})`))
       }, this.#requestTimeout)
 
       this.#pendingRequests.set(id, {
@@ -444,14 +389,8 @@ export class LspClient {
         }
         this.#pendingRequests.delete(message.id)
         if (message.error) {
-          if (this.#debug) {
-            console.error(`[LSP] Response ${message.id}: ERROR - ${message.error.message}`)
-          }
           pending.reject(new Error(`LSP Error: ${message.error.message}`))
         } else {
-          if (this.#debug) {
-            console.error(`[LSP] Response ${message.id}: OK`)
-          }
           pending.resolve(message.result)
         }
       }

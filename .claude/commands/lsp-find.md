@@ -1,20 +1,13 @@
 ---
-description: Type-aware symbol search across workspace (use /fast-find for quick text search)
-allowed-tools: Bash, Glob
+description: Search for TypeScript symbols across the workspace by name
+allowed-tools: Bash
 ---
 
 # LSP Find
 
-**Type-aware** symbol search across the TypeScript/JavaScript codebase. Understands type aliases, re-exports, and symbol scope.
+Search for symbols (functions, types, classes, variables) across the TypeScript/JavaScript codebase.
 
 **Arguments:** $ARGUMENTS
-
-**When to use:**
-- Need accurate symbol matching (not just text)
-- Understanding type aliases and re-exports
-- Symbol disambiguation (e.g., multiple `Config` types)
-
-**For faster text-based search, use `/fast-find` instead.**
 
 ## Usage
 
@@ -40,23 +33,14 @@ Examples:
   /lsp-find useTemplate src/main/use-template.ts
 ```
 
-### Step 2: Locate typescript-lsp Skill
+### Step 2: Run LSP Find
 
-Find the typescript-lsp skill directory. Use Glob to locate it:
-```glob
-**/typescript-lsp/SKILL.md
-```
-
-The skill directory is the parent of SKILL.md.
-
-### Step 3: Run LSP Find
-
-From the skill directory, run:
+Execute the development-skills CLI command:
 ```bash
-bun <skill-dir>/scripts/lsp-find.ts <query> [context-file]
+bunx @plaited/development-skills lsp-find <query> [context-file]
 ```
 
-### Step 4: Format Output
+### Step 3: Format Output
 
 Parse the JSON output and present results as a table:
 

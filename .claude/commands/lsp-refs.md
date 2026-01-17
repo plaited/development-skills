@@ -1,6 +1,6 @@
 ---
 description: Find all references to a TypeScript symbol across the codebase
-allowed-tools: Bash, Glob
+allowed-tools: Bash
 ---
 
 # LSP References
@@ -32,23 +32,14 @@ Usage: /lsp-refs <file> <line> <char>
 Example: /lsp-refs src/utils/parser.ts 42 10
 ```
 
-### Step 2: Locate typescript-lsp Skill
+### Step 2: Run LSP References
 
-Find the typescript-lsp skill directory. Use Glob to locate it:
-```glob
-**/typescript-lsp/SKILL.md
-```
-
-The skill directory is the parent of SKILL.md.
-
-### Step 3: Run LSP References
-
-From the skill directory, run:
+Execute the development-skills CLI command:
 ```bash
-bun <skill-dir>/scripts/lsp-references.ts <file> <line> <char>
+bunx @plaited/development-skills lsp-refs <file> <line> <char>
 ```
 
-### Step 4: Format Output
+### Step 3: Format Output
 
 Parse the JSON output and present references grouped by file:
 
