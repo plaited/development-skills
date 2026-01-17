@@ -120,7 +120,11 @@ Examples:
     process.exit(0)
   }
 
-  const filePath = positionals[0]!
+  const filePath = positionals[0]
+  if (!filePath) {
+    console.error('Error: File path required')
+    process.exit(1)
+  }
   const absolutePath = await resolveFilePath(filePath)
   const uri = `file://${absolutePath}`
   const rootUri = `file://${process.cwd()}`

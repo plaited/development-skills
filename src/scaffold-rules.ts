@@ -165,6 +165,7 @@ const processConditionals = (content: string, context: TemplateContext): string 
 
     // Process positive conditionals {{#if condition}}...{{/if}}
     // Use non-greedy match that doesn't cross other conditional boundaries
+    // Note: Nested quantifiers are safe here - input is trusted bundled templates, not user content
     result = result.replace(
       /\{\{#if ([\w:-]+)\}\}((?:(?!\{\{#if )(?!\{\{\^if )(?!\{\{\/if\}\})[\s\S])*?)\{\{\/if\}\}/g,
       (_, condition, block) => {
