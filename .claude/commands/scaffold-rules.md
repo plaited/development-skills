@@ -41,19 +41,19 @@ Parse the JSON output to get available templates. The output structure is:
 
 ### Step 2: Detect Agent & Scan Existing Rules
 
-Determine target rules location based on agent environment:
+The CLI supports 2 target formats:
 
-Check for existing agent configuration files:
+| Target | Rules Location | Use Case |
+|--------|----------------|----------|
+| `claude` | `.claude/rules/` | Claude Code (default) |
+| `agents-md` | `.plaited/rules/` + `AGENTS.md` | Universal format for Cursor, Factory, Copilot, Windsurf, Cline, Aider, and 60,000+ other projects |
+
+Check for existing configuration:
 ```
-.claude/          → Claude Code (.claude/rules/)
-.cursor/rules/    → Cursor (multi-file)
-.factory/rules/   → Factory (multi-file)
-.plaited/rules/   → AGENTS.md compatible (universal)
-AGENTS.md         → Universal fallback (links to .plaited/rules/)
-.github/copilot-instructions.md → GitHub Copilot
-.windsurfrules    → Windsurf
-.clinerules       → Cline/Roo
-.aider.conf.yml   → Aider
+.claude/          → Use --agent=claude (default)
+AGENTS.md         → Use --agent=agents-md
+.plaited/rules/   → Use --agent=agents-md
+Any other agent   → Use --agent=agents-md (universal)
 ```
 
 **Always scan for existing rules before writing.** Use Read tool to check what's already there.
@@ -108,7 +108,7 @@ For merges:
 After user approval, write the rules using the content from CLI output:
 
 - Use Write tool with `content` from CLI JSON
-- Create directories if needed (`.claude/rules/`, etc.)
+- Create directories if needed (`.claude/rules/` or `.plaited/rules/`)
 - Write/merge files as approved
 - Report what was created/modified
 
@@ -119,7 +119,7 @@ The CLI processes template variables automatically. The content in the JSON outp
 **Template Processing:**
 The CLI handles:
 - Template variable substitution ({{LINK:*}}, {{AGENT_NAME}}, etc.)
-- Conditional blocks ({{#if development-skills}}, {{#if agent:*}})
+- Capability-based conditionals ({{#if has-sandbox}}, {{#if supports-slash-commands}})
 - Template header removal
 - Cross-reference formatting for detected agent
 
@@ -134,7 +134,7 @@ The CLI handles:
 **Git Workflow:**
 - Conventional commit prefixes (feat, fix, refactor, docs, chore, test)
 - Multi-line commit message format
-- Sandbox workarounds (if applicable to agent)
+- Sandbox workarounds (Claude Code only)
 
 **GitHub CLI:**
 - Prefer `gh` CLI over WebFetch for GitHub URLs
@@ -176,30 +176,26 @@ After completion, summarize what was done:
 
 ### CLI Usage
 
-The scaffold-rules CLI can be called with options:
+The scaffold-rules CLI supports 2 target formats:
 
 ```bash
 # Default: outputs all rules for Claude Code
-bunx @plaited/development-skills scaffold-rules --format=json
+bunx @plaited/development-skills scaffold-rules
 
-# Specify agent
-bunx @plaited/development-skills scaffold-rules --agent=cursor --format=json
-bunx @plaited/development-skills scaffold-rules --agent=factory --format=json
-
-# Universal AGENTS.md format (works with most agents)
-bunx @plaited/development-skills scaffold-rules --agent=agents-md --format=json
+# Universal AGENTS.md format (works with Cursor, Factory, Copilot, Windsurf, Cline, Aider, etc.)
+bunx @plaited/development-skills scaffold-rules --agent=agents-md
 
 # Filter specific rules
 bunx @plaited/development-skills scaffold-rules --rules testing --rules bun-apis
 ```
 
 **Options:**
-- `--agent` / `-a`: Target agent (claude, cursor, factory, copilot, windsurf, cline, aider, agents-md)
+- `--agent` / `-a`: Target format (`claude` or `agents-md`)
 - `--format` / `-f`: Output format (json)
 - `--rules` / `-r`: Specific rules to include (can be used multiple times)
 
 **Output Structure:**
-The JSON output includes metadata about the target agent:
+The JSON output includes metadata about the target:
 ```json
 {
   "agent": "agents-md",
@@ -215,4 +211,4 @@ For `agents-md` format, write:
 1. Individual rule files to `.plaited/rules/`
 2. The `agentsMdContent` to `AGENTS.md` in project root
 
-This provides maximum portability - rules work with any AGENTS.md-compatible agent.
+This provides maximum portability - rules work with any AGENTS.md-compatible agent (60,000+ projects support this format).

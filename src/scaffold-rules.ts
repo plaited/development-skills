@@ -5,6 +5,11 @@
  * Reads bundled rule templates, processes template variables and conditionals,
  * and outputs JSON for agent consumption.
  *
+ * Supports 2 target formats:
+ * - claude: Claude Code with .claude/rules/ directory
+ * - agents-md: Universal AGENTS.md format with .plaited/rules/
+ *   (works with Cursor, Factory, Copilot, Windsurf, Cline, Aider, and 60,000+ others)
+ *
  * Template syntax:
  * - {{LINK:rule-id}} - Cross-reference to another rule
  * - {{#if development-skills}}...{{/if}} - Conditional block
@@ -13,15 +18,13 @@
  * - <!-- RULE TEMPLATE ... --> - Template header (removed)
  *
  * Capabilities:
- * - has-sandbox: Agent runs in sandboxed environment (e.g., Claude Code)
- * - multi-file-rules: Agent supports rules directory structure
- * - supports-slash-commands: Agent has /command syntax
- * - supports-agents-md: Agent reads AGENTS.md format
+ * - has-sandbox: Agent runs in sandboxed environment (Claude Code only)
+ * - supports-slash-commands: Agent has /command syntax (Claude Code only)
  *
  * @example
  * ```bash
- * bunx @plaited/development-skills scaffold-rules --agent=claude --format=json
- * bunx @plaited/development-skills scaffold-rules --agent=agents-md --format=json
+ * bunx @plaited/development-skills scaffold-rules --agent=claude
+ * bunx @plaited/development-skills scaffold-rules --agent=agents-md
  * ```
  */
 
@@ -29,7 +32,15 @@ import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
-type Agent = 'claude' | 'cursor' | 'factory' | 'copilot' | 'windsurf' | 'cline' | 'aider' | 'agents-md'
+/**
+ * Supported agent targets
+ *
+ * @remarks
+ * - claude: Claude Code with its own .claude/ directory structure
+ * - agents-md: Universal AGENTS.md format (works with Cursor, Factory, Copilot,
+ *   Windsurf, Cline, Aider, and 60,000+ other projects)
+ */
+type Agent = 'claude' | 'agents-md'
 
 type AgentCapabilities = {
   hasSandbox: boolean
@@ -54,7 +65,7 @@ type ProcessedTemplate = {
 type ScaffoldOutput = {
   agent: Agent
   rulesPath: string
-  format: 'multi-file' | 'single-file' | 'agents-md'
+  format: 'multi-file' | 'agents-md'
   supportsAgentsMd: boolean
   agentsMdContent?: string
   templates: Record<string, ProcessedTemplate>
@@ -67,54 +78,23 @@ type ScaffoldOutput = {
  * - hasSandbox: Runs in restricted environment (affects git commands, temp files)
  * - multiFileRules: Supports directory of rule files vs single file
  * - supportsSlashCommands: Has /command syntax for invoking tools
- * - supportsAgentsMd: Reads AGENTS.md format (most modern agents do)
+ * - supportsAgentsMd: Reads AGENTS.md format
+ *
+ * Note: We only support 2 targets now:
+ * - claude: Claude Code with unique .claude/ directory system
+ * - agents-md: Universal format for all AGENTS.md-compatible agents
+ *   (Cursor, Factory, Copilot, Windsurf, Cline, Aider, and 60,000+ others)
  */
 const AGENT_CAPABILITIES: Record<Agent, AgentCapabilities> = {
   claude: {
     hasSandbox: true,
     multiFileRules: true,
     supportsSlashCommands: true,
-    supportsAgentsMd: false, // Claude Code uses .claude/ directory
-  },
-  cursor: {
-    hasSandbox: false,
-    multiFileRules: true,
-    supportsSlashCommands: false,
-    supportsAgentsMd: true,
-  },
-  factory: {
-    hasSandbox: false,
-    multiFileRules: true,
-    supportsSlashCommands: false,
-    supportsAgentsMd: true,
-  },
-  copilot: {
-    hasSandbox: false,
-    multiFileRules: false,
-    supportsSlashCommands: false,
-    supportsAgentsMd: true,
-  },
-  windsurf: {
-    hasSandbox: false,
-    multiFileRules: false,
-    supportsSlashCommands: false,
-    supportsAgentsMd: false, // Uses .windsurfrules
-  },
-  cline: {
-    hasSandbox: false,
-    multiFileRules: false,
-    supportsSlashCommands: false,
-    supportsAgentsMd: false, // Uses .clinerules
-  },
-  aider: {
-    hasSandbox: false,
-    multiFileRules: false,
-    supportsSlashCommands: false,
-    supportsAgentsMd: true,
+    supportsAgentsMd: false,
   },
   'agents-md': {
     hasSandbox: false,
-    multiFileRules: true, // Uses .plaited/rules/ with AGENTS.md linking
+    multiFileRules: true,
     supportsSlashCommands: false,
     supportsAgentsMd: true,
   },
@@ -221,23 +201,12 @@ const processVariables = (content: string, context: TemplateContext): string => 
  * Generate cross-reference based on agent format
  */
 const generateCrossReference = (ruleId: string, context: TemplateContext): string => {
-  switch (context.agent) {
-    case 'claude':
-      // Claude Code uses @ syntax for file references
-      return `@${context.rulesPath}/${ruleId}.md`
-    case 'cursor':
-      return `.cursor/rules/${ruleId}.md`
-    case 'factory':
-      return `.factory/rules/${ruleId}.md`
-    case 'agents-md':
-      // AGENTS.md links to .plaited/rules/
-      return `.plaited/rules/${ruleId}.md`
-    case 'copilot':
-      // Copilot uses section references within single file
-      return `See "${ruleId}" section`
-    default:
-      return `${ruleId}.md`
+  if (context.agent === 'claude') {
+    // Claude Code uses @ syntax for file references
+    return `@${context.rulesPath}/${ruleId}.md`
   }
+  // AGENTS.md links to .plaited/rules/
+  return `.plaited/rules/${ruleId}.md`
 }
 
 /**
@@ -291,37 +260,14 @@ const processTemplate = (content: string, context: TemplateContext): string => {
  * Get rules path for agent
  */
 const getRulesPath = (agent: Agent): string => {
-  switch (agent) {
-    case 'claude':
-      return '.claude/rules'
-    case 'cursor':
-      return '.cursor/rules'
-    case 'factory':
-      return '.factory/rules'
-    case 'agents-md':
-      return '.plaited/rules'
-    case 'copilot':
-      return '.github/copilot-instructions.md'
-    case 'windsurf':
-      return '.windsurfrules'
-    case 'cline':
-      return '.clinerules'
-    case 'aider':
-      return '.aider.conf.yml'
-    default:
-      return '.claude/rules'
-  }
+  return agent === 'claude' ? '.claude/rules' : '.plaited/rules'
 }
 
 /**
  * Get output format for agent
  */
-const getOutputFormat = (agent: Agent): 'multi-file' | 'single-file' | 'agents-md' => {
-  if (agent === 'agents-md') {
-    return 'agents-md'
-  }
-  const capabilities = AGENT_CAPABILITIES[agent]
-  return capabilities.multiFileRules ? 'multi-file' : 'single-file'
+const getOutputFormat = (agent: Agent): 'multi-file' | 'agents-md' => {
+  return agent === 'claude' ? 'multi-file' : 'agents-md'
 }
 
 /**
@@ -384,9 +330,12 @@ export const scaffoldRules = async (args: string[]): Promise<void> => {
   const rulesFilter = values.rules as string[] | undefined
 
   // Validate agent
-  const validAgents: Agent[] = ['claude', 'cursor', 'factory', 'copilot', 'windsurf', 'cline', 'aider', 'agents-md']
+  const validAgents: Agent[] = ['claude', 'agents-md']
   if (!validAgents.includes(agent)) {
     console.error(`Error: Invalid agent "${agent}". Must be one of: ${validAgents.join(', ')}`)
+    console.error(
+      'Note: Use "agents-md" for Cursor, Factory, Copilot, Windsurf, Cline, Aider, and other AGENTS.md-compatible tools.',
+    )
     process.exit(1)
   }
 
